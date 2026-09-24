@@ -78,4 +78,4 @@ Provides granular tracking across precision, recall, and f1-score:
 * **Precision:** Out of all cases flagged as readmitted, how many were actually readmitted?
 * **Recall:** Out of all actual readmissions, how many did the model successfully catch?
 * **F1-Score:** The harmonic mean balancing precision and recall together.
-## .Ashenafi Abera
+## Ashenafi Abera
