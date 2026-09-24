@@ -36,3 +36,45 @@ Depending on the criteria above, features can be filtered out using three main a
 | **Filter Methods** | Evaluates features independently of the model based on their intrinsic statistical properties. | Correlation Matrix, Chi-Square Test, Variance Threshold |
 | **Wrapper Methods** | Uses a machine learning model to evaluate combinations of features, adding or removing them iteratively. | Forward Selection, Backward Elimination, Recursive Feature Elimination (RFE) |
 | **Embedded Methods** | Feature selection happens natively and automatically *during* the model training process. | Lasso (L1) Regression Penalty, **Decision Tree Feature Importances** |
+
+---
+
+## 🚀 Getting Started
+
+To run the machine learning script locally, follow these quick setup steps.
+
+### Prerequisites
+Make sure you have Python installed, along with the required libraries. You can install them via terminal/command prompt:
+```bash
+pip install pandas scikit-learn
+```
+
+### Execution
+1. Clone this repository or download the files.
+2. Place the `diabetic_data.csv` dataset in the same directory as the script.
+3. Run the Python model:
+```bash
+python diabetes_readmission_tree.py
+```
+
+---
+
+## 📊 Model Performance & Evaluation
+
+The script evaluates the `DecisionTreeClassifier` (set to a balanced class weight and a max depth of 5) using three core metrics to guarantee transparent evaluation:
+
+### 1. Accuracy Score
+Reflects the overall percentage of correct predictions across both classes.
+
+### 2. Confusion Matrix
+Breaks down the raw count of predictions vs. actual reality:
+* **True Negatives (TN):** Correctly predicted *Not Readmitted*.
+* **False Positives (FP):** Incorrectly predicted *Readmitted*.
+* **False Negatives (FN):** Incorrectly predicted *Not Readmitted*.
+* **True Positives (TP):** Correctly predicted *Readmitted*.
+
+### 3. Classification Report
+Provides granular tracking across precision, recall, and f1-score:
+* **Precision:** Out of all cases flagged as readmitted, how many were actually readmitted?
+* **Recall:** Out of all actual readmissions, how many did the model successfully catch?
+* **F1-Score:** The harmonic mean balancing precision and recall together.
