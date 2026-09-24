@@ -1,43 +1,38 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+# Feature Selection Criteria in Machine Learning
 
-# 1. Load data
-df = pd.read_csv("diabetic_data.csv")
+When building predictive models, the goal of feature selection is to identify the smallest subset of variables that yields the maximum predictive power. This file outlines the four core pillars of feature selection criteria used in our workflow.
 
-# 2. Advanced Feature Engineering (Mapping string ranges to numeric midpoints)
-age_mapping = {
-    "[0-10)": 5, "[10-20)": 15, "[20-30)": 25, "[30-40)": 35, "[40-50)": 45,
-    "[50-60)": 55, "[60-70)": 65, "[70-80)": 75, "[80-90)": 85, "[90-100)": 95
-}
-df["age_numeric"] = df["age"].map(age_mapping)
+## 📋 The Four Pillars of Feature Selection
 
-# 3. Target Feature Engineering (Creating binary 1s and 0s)
-df["readmitted_binary"] = (df["readmitted"] != "NO").astype(int)
+### 1. Relevance to the Target (Predictive Power)
+A feature must share a meaningful relationship with the variable you are trying to predict.
+* **Statistical Significance:** Features should have a measurable statistical relationship with the target (e.g., a high correlation coefficient for linear models, or high mutual information for non-linear models).
+* **Variance Threshold:** Features must exhibit variation. If a column contains the identical value for 99% of your rows (near-zero variance), it provides virtually no information for the model to learn from.
 
-# 4. Isolate Features Matrix (X) and Target Vector (y)
-features = [
-    "age_numeric", "time_in_hospital", "num_lab_procedures", 
-    "num_procedures", "num_medications", "number_outpatient", 
-    "number_emergency", "number_inpatient", "number_diagnoses"
-]
-X = df[features]
-y = df["readmitted_binary"]
+### 2. Redundancy & Collinearity
+Features should provide entirely *new* information, rather than replicating what another feature has already captured.
+* **Low Multicollinearity:** If two features are highly correlated with each other (e.g., `patient_age_in_years` and `patient_birth_year`), one should be omitted. Keeping both introduces noise and destabilizes tree splits or regression coefficients.
+* **Information Uniqueness:** Every added feature should explain a distinct dimension of the variance in the dataset.
 
-# 5. Data Splitting (Freeze split across sessions)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+### 3. Computational Efficiency & Parsimony
+Including too many features slows down training, increases inference times, and risks overfitting.
+* **The Principle of Parsimony (Occam's Razor):** A simpler model with fewer features is often vastly superior in a production environment due to easier maintenance and faster execution speeds.
+* **Curse of Dimensionality:** Keeping feature counts low prevents data from becoming too sparse, allowing models to find genuine, generalizable patterns.
 
-# 6. Model Construction & Fitting
-model = DecisionTreeClassifier(max_depth=5, random_state=42)
-model.fit(X_train, y_train)
+### 4. Data Quality & Operational Constraints
+A feature might be statistically valuable but functionally or operationally unusable.
+* **Missingness:** If a feature is missing data in a majority of your records, the risk of guessing (imputing) those values often outweighs the benefit of keeping it.
+* **Data Leakage:** Features must not contain information that wouldn't actually be available at the exact moment of prediction (e.g., including future discharge data when predicting a current admission).
+* **Engineering Cost:** Avoid features that require expensive external API calls, immense computational overhead, or fragile upstream pipelines to calculate in real-time.
 
-# 7. Prediction Generation & Final Evaluations
-y_pred = model.predict(X_test)
+---
 
-print("--- EVALUATION REPORT ---")
-print(f"Overall Accuracy Score: {accuracy_score(y_test, y_pred) * 100:.2f}%\n")
-print("Confusion Matrix Layout:")
-print(confusion_matrix(y_test, y_pred))
-print("\nDetailed Performance Breakdown:")
-print(classification_report(y_test, y_pred, target_names=["Not Readmitted (0)", "Readmitted (1)"]))
+## 🛠️ Feature Selection Approaches
+
+Depending on the criteria above, features can be filtered out using three main algorithmic strategies:
+
+| Approach | How it Works | Common Examples |
+| :--- | :--- | :--- |
+| **Filter Methods** | Evaluates features independently of the model based on their intrinsic statistical properties. | Correlation Matrix, Chi-Square Test, Variance Threshold |
+| **Wrapper Methods** | Uses a machine learning model to evaluate combinations of features, adding or removing them iteratively. | Forward Selection, Backward Elimination, Recursive Feature Elimination (RFE) |
+| **Embedded Methods** | Feature selection happens natively and automatically *during* the model training process. | Lasso (L1) Regression Penalty, **Decision Tree Feature Importances** |
